@@ -60,6 +60,8 @@ function postTopic_(title, description, link) {
   var text = "*" + title + "*" + "\n";
   
   if (description){
+    description = stripHtmlTags(description);
+    description = decodeHtmlEntities(description);
     text += description + "\n";
   }
   
@@ -74,4 +76,25 @@ function postTopic_(title, description, link) {
   };
   
   UrlFetchApp.fetch(WEBHOOK_URL, options);
+}
+
+function stripHtmlTags(str) {
+  if ((str===null) || (str===''))
+    return false;
+  else
+    str = str.toString();
+    
+  return str.replace(/<[^>]*>/g, '');
+}
+
+function decodeHtmlEntities(str) {
+  if ((str===null) || (str===''))
+    return false;
+  else
+    str = str.toString();
+  
+  var doc = XmlService.parse('<html>' + str + '</html>');
+  var decodedStr = XmlService.getRawFormat().format(doc.getRootElement());
+  
+  return decodedStr.substring(6, decodedStr.length - 7); // Remove <html> and </html> tags
 }
